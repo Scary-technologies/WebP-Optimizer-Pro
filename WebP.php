@@ -4,7 +4,7 @@
  * Description: افزونه‌ای پیشرفته برای بهینه‌سازی و تبدیل تصاویر آپلود شده به فرمت WebP.
  * Version: 1.0.0
  * Author: Scary Technologies
- * Plugin URI: https://github.com/Scary-technologies/WebP-Optimizer-Pro
+ * <a href="https://github.com/Scary-technologies/WebP-Optimizer-Pro" target="_blank">مشاهده ریپوزیتوری در GitHub</a>
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -114,6 +114,53 @@ class SimpleWebPConverter {
 
     public function render_bulk_convert_page() {
         ?>
+        <div class="wrap">
+            <h1>تبدیل تصاویر به WebP</h1>
+            <?php if ( isset( $_GET['success'] ) && $_GET['success'] == 1 ) : ?>
+                <div class="notice notice-success is-dismissible">
+                    <p>تمامی تصاویر با موفقیت به فرمت WebP تبدیل شدند.</p>
+                </div>
+            <?php endif; ?>
+            <form method="post" action="<?php echo admin_url( 'admin-post.php' ); ?>" style="background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);">
+                <input type="hidden" name="action" value="convert_to_webp">
+                <div style="margin-bottom: 15px;">
+                    <label for="quality" style="font-weight: bold;">کیفیت تصویر (0-100):</label>
+                    <input type="number" id="quality" name="quality" value="80" min="0" max="100" style="width: 100px;">
+                </div>
+                <?php submit_button( 'تبدیل همه تصاویر', 'primary', '', false, [ 'style' => 'background-color: #0073aa; border-color: #0073aa; color: #fff; padding: 10px 20px; font-size: 16px;' ] ); ?>
+            </form>
+            <div id="conversion-progress" style="margin-top: 20px; display: none;">
+                <h2>پیشرفت تبدیل</h2>
+                <progress id="progress-bar" value="0" max="100" style="width: 100%; height: 30px;"></progress>
+                <p id="progress-status" style="font-weight: bold; text-align: center; margin-top: 10px;"></p>
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const form = document.querySelector('form');
+                    form.addEventListener('submit', function(event) {
+                        event.preventDefault();
+                        const progressBar = document.getElementById('progress-bar');
+                        const progressStatus = document.getElementById('progress-status');
+                        const progressContainer = document.getElementById('conversion-progress');
+
+                        progressContainer.style.display = 'block';
+                        progressStatus.textContent = 'در حال آماده‌سازی...';
+
+                        fetch('<?php echo admin_url( 'admin-post.php' ); ?>', {
+                            method: 'POST',
+                            body: new FormData(form)
+                        }).then(response => {
+                            if (response.ok) {
+                                progressBar.value = 100;
+                                progressStatus.textContent = 'تبدیل همه تصاویر به پایان رسید.';
+                            } else {
+                                progressStatus.textContent = 'خطایی در فرآیند تبدیل رخ داده است.';
+                            }
+                        });
+                    });
+                });
+            </script>
+        </div>
         <div class="wrap">
             <h1>تبدیل تصاویر به WebP</h1>
             <?php if ( isset( $_GET['success'] ) && $_GET['success'] == 1 ) : ?>
